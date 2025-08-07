@@ -12,6 +12,7 @@ import io.opentelemetry.exporter.internal.marshal.Marshaler;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.internal.ThrottlingLogger;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -29,7 +30,7 @@ public final class HttpExporter<T extends Marshaler> {
 
   private static final Logger internalLogger = Logger.getLogger(HttpExporter.class.getName());
 
-  private final ThrottlingLogger logger = new ThrottlingLogger(internalLogger);
+  private final ThrottlingLogger logger;
   private final AtomicBoolean isShutdown = new AtomicBoolean();
 
   private final String type;
@@ -48,6 +49,25 @@ public final class HttpExporter<T extends Marshaler> {
         exportAsJson
             ? ExporterMetrics.createHttpJson(exporterName, type, meterProviderSupplier)
             : ExporterMetrics.createHttpProtobuf(exporterName, type, meterProviderSupplier);
+    this.logger = new ThrottlingLogger(internalLogger);
+  }
+
+  public HttpExporter(
+      String exporterName,
+      String type,
+      HttpSender httpSender,
+      Supplier<MeterProvider> meterProviderSupplier,
+      boolean exportAsJson,
+      double rateLimit,
+      double throttledRateLimit,
+      TimeUnit rateTimeUnit) {
+    this.type = type;
+    this.httpSender = httpSender;
+    this.exporterMetrics =
+        exportAsJson
+            ? ExporterMetrics.createHttpJson(exporterName, type, meterProviderSupplier)
+            : ExporterMetrics.createHttpProtobuf(exporterName, type, meterProviderSupplier);
+    this.logger = new ThrottlingLogger(internalLogger, rateLimit, throttledRateLimit, rateTimeUnit);
   }
 
   public CompletableResultCode export(T exportRequest, int numItems) {

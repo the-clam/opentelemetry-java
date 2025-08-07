@@ -13,6 +13,8 @@ import io.opentelemetry.exporter.internal.ExporterMetrics;
 import io.opentelemetry.exporter.internal.marshal.Marshaler;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.internal.ThrottlingLogger;
+
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -29,7 +31,7 @@ public final class GrpcExporter<T extends Marshaler> {
 
   private static final Logger internalLogger = Logger.getLogger(GrpcExporter.class.getName());
 
-  private final ThrottlingLogger logger = new ThrottlingLogger(internalLogger);
+  private final ThrottlingLogger logger;
 
   // We only log unimplemented once since it's a configuration issue that won't be recovered.
   private final AtomicBoolean loggedUnimplemented = new AtomicBoolean();
@@ -47,6 +49,22 @@ public final class GrpcExporter<T extends Marshaler> {
     this.type = type;
     this.grpcSender = grpcSender;
     this.exporterMetrics = ExporterMetrics.createGrpc(exporterName, type, meterProviderSupplier);
+    this.logger = new ThrottlingLogger(internalLogger);
+  }
+
+  public GrpcExporter(
+      String exporterName,
+      String type,
+      GrpcSender<T> grpcSender,
+      Supplier<MeterProvider> meterProviderSupplier,
+      double rateLimit,
+      double throttledRateLimit,
+      TimeUnit rateTimeUnit
+  ) {
+    this.type = type;
+    this.grpcSender = grpcSender;
+    this.exporterMetrics = ExporterMetrics.createGrpc(exporterName, type, meterProviderSupplier);
+    this.logger = new ThrottlingLogger(internalLogger, rateLimit, throttledRateLimit, rateTimeUnit);
   }
 
   public CompletableResultCode export(T exportRequest, int numItems) {

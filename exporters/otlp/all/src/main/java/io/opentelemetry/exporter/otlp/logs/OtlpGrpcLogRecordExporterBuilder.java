@@ -258,6 +258,22 @@ public final class OtlpGrpcLogRecordExporterBuilder {
   }
 
   /**
+   * bruh
+   */
+  public OtlpGrpcLogRecordExporterBuilder setThrottlingLoggerRate(double rateLimit, double throttledRateLimit) {
+    delegate.setLogThrottlingRate(rateLimit, throttledRateLimit);
+    return this;
+  }
+
+  /**
+   * bruh
+   */
+  public OtlpGrpcLogRecordExporterBuilder setThrottlingLoggerTimeUnit(TimeUnit rateTimeUnit) {
+    delegate.setLogThrottlingTimeUnit(rateTimeUnit);
+    return this;
+  }
+
+  /**
    * Constructs a new instance of the exporter based on the builder's values.
    *
    * @return a new exporter's instance

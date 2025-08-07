@@ -66,6 +66,10 @@ public class GrpcExporterBuilder<T extends Marshaler> {
   // Use Object type since gRPC may not be on the classpath.
   @Nullable private Object grpcChannel;
 
+  private double throttlingLoggerRateLimit = 5;
+  private double throttlingLoggerThrottledRateLimit = 1;
+  private TimeUnit throttlingLoggerTimeUnit = TimeUnit.MINUTES;
+
   public GrpcExporterBuilder(
       String exporterName,
       String type,
@@ -147,6 +151,17 @@ public class GrpcExporterBuilder<T extends Marshaler> {
     return this;
   }
 
+  public GrpcExporterBuilder<T> setLogThrottlingRate(double rateLimit, double throttledRateLimit){
+    this.throttlingLoggerRateLimit = rateLimit;
+    this.throttlingLoggerThrottledRateLimit = throttledRateLimit;
+    return this;
+  }
+
+  public GrpcExporterBuilder<T> setLogThrottlingTimeUnit(TimeUnit rateTimeUnit){
+    this.throttlingLoggerTimeUnit = rateTimeUnit;
+    return this;
+  }
+
   @SuppressWarnings("BuilderReturnThis")
   public GrpcExporterBuilder<T> copy() {
     GrpcExporterBuilder<T> copy =
@@ -212,7 +227,7 @@ public class GrpcExporterBuilder<T extends Marshaler> {
             isPlainHttp ? null : tlsConfigHelper.getTrustManager());
     LOGGER.log(Level.FINE, "Using GrpcSender: " + grpcSender.getClass().getName());
 
-    return new GrpcExporter<>(exporterName, type, grpcSender, meterProviderSupplier);
+    return new GrpcExporter<>(exporterName, type, grpcSender, meterProviderSupplier, throttlingLoggerRateLimit, throttlingLoggerThrottledRateLimit, throttlingLoggerTimeUnit);
   }
 
   public String toString(boolean includePrefixAndSuffix) {

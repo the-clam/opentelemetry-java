@@ -44,7 +44,9 @@ public class OtlpMetricExporterProvider implements ConfigurableMetricExporterPro
           builder::setTrustedCertificates,
           builder::setClientTls,
           builder::setRetryPolicy,
-          builder::setMemoryMode);
+          builder::setMemoryMode,
+          builder::setThrottlingLoggerRate,
+          builder::setThrottlingLoggerTimeUnit);
       OtlpConfigUtil.configureOtlpAggregationTemporality(
           config, builder::setAggregationTemporalitySelector);
       OtlpConfigUtil.configureOtlpHistogramDefaultAggregation(
@@ -64,7 +66,9 @@ public class OtlpMetricExporterProvider implements ConfigurableMetricExporterPro
           builder::setTrustedCertificates,
           builder::setClientTls,
           builder::setRetryPolicy,
-          builder::setMemoryMode);
+          builder::setMemoryMode,
+          builder::setThrottlingLoggerRate,
+          builder::setThrottlingLoggerTimeUnit);
       OtlpConfigUtil.configureOtlpAggregationTemporality(
           config, builder::setAggregationTemporalitySelector);
       OtlpConfigUtil.configureOtlpHistogramDefaultAggregation(

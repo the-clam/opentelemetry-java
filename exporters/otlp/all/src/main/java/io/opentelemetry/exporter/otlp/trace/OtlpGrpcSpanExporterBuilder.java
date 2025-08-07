@@ -255,6 +255,22 @@ public final class OtlpGrpcSpanExporterBuilder {
   }
 
   /**
+   * bruh
+   */
+  public OtlpGrpcSpanExporterBuilder setThrottlingLoggerRate(double rateLimit, double throttledRateLimit) {
+    delegate.setLogThrottlingRate(rateLimit, throttledRateLimit);
+    return this;
+  }
+
+  /**
+   * bruh
+   */
+  public OtlpGrpcSpanExporterBuilder setThrottlingLoggerTimeUnit(TimeUnit rateTimeUnit) {
+    delegate.setLogThrottlingTimeUnit(rateTimeUnit);
+    return this;
+  }
+
+  /**
    * Constructs a new instance of the exporter based on the builder's values.
    *
    * @return a new exporter's instance

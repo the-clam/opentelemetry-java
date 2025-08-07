@@ -52,7 +52,9 @@ public class OtlpLogRecordExporterProvider
           builder::setTrustedCertificates,
           builder::setClientTls,
           builder::setRetryPolicy,
-          builder::setMemoryMode);
+          builder::setMemoryMode,
+          builder::setThrottlingLoggerRate,
+          builder::setThrottlingLoggerTimeUnit);
       builder.setMeterProvider(meterProviderRef::get);
 
       return builder.build();
@@ -69,7 +71,9 @@ public class OtlpLogRecordExporterProvider
           builder::setTrustedCertificates,
           builder::setClientTls,
           builder::setRetryPolicy,
-          builder::setMemoryMode);
+          builder::setMemoryMode,
+          builder::setThrottlingLoggerRate,
+          builder::setThrottlingLoggerTimeUnit);
       builder.setMeterProvider(meterProviderRef::get);
 
       return builder.build();

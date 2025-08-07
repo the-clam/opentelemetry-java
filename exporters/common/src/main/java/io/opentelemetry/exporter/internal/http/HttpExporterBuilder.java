@@ -63,6 +63,10 @@ public final class HttpExporterBuilder<T extends Marshaler> {
   private Supplier<MeterProvider> meterProviderSupplier = GlobalOpenTelemetry::getMeterProvider;
   @Nullable private Authenticator authenticator;
 
+  private double throttlingLoggerRateLimit = 5;
+  private double throttlingLoggerThrottledRateLimit = 1;
+  private TimeUnit throttlingLoggerTimeUnit = TimeUnit.MINUTES;
+
   public HttpExporterBuilder(String exporterName, String type, String defaultEndpoint) {
     this.exporterName = exporterName;
     this.type = type;
@@ -143,6 +147,17 @@ public final class HttpExporterBuilder<T extends Marshaler> {
     return this;
   }
 
+  public HttpExporterBuilder<T> setLogThrottlingRate(double rateLimit, double throttledRateLimit){
+    this.throttlingLoggerRateLimit = rateLimit;
+    this.throttlingLoggerThrottledRateLimit = throttledRateLimit;
+    return this;
+  }
+
+  public HttpExporterBuilder<T> setLogThrottlingTimeUnit(TimeUnit rateTimeUnit){
+    this.throttlingLoggerTimeUnit = rateTimeUnit;
+    return this;
+  }
+  
   @SuppressWarnings("BuilderReturnThis")
   public HttpExporterBuilder<T> copy() {
     HttpExporterBuilder<T> copy = new HttpExporterBuilder<>(exporterName, type, endpoint);
@@ -203,7 +218,7 @@ public final class HttpExporterBuilder<T extends Marshaler> {
             isPlainHttp ? null : tlsConfigHelper.getTrustManager());
     LOGGER.log(Level.FINE, "Using HttpSender: " + httpSender.getClass().getName());
 
-    return new HttpExporter<>(exporterName, type, httpSender, meterProviderSupplier, exportAsJson);
+    return new HttpExporter<>(exporterName, type, httpSender, meterProviderSupplier, exportAsJson, throttlingLoggerRateLimit, throttlingLoggerThrottledRateLimit, throttlingLoggerTimeUnit);
   }
 
   public String toString(boolean includePrefixAndSuffix) {
